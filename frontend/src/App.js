@@ -1,23 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/Cadastro';
-import MenuPage from './pages/Menu';
-import VendasPage from './pages/Vendas';
-import ComprasPage from './pages/Compras';
-import PerfilPage from './pages/Perfil';
-
-
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Login from './pages/LoginPage';
+import Perfil from './pages/Perfil';
+import Vendas from './pages/Vendas';
+import Compras from './pages/Compras';
+import Menu from './pages/Menu';
 
 function App() {
+  const token = localStorage.getItem('token');
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/cadastro" element={<RegisterPage />} />
-        <Route path="/menu" element={<MenuPage />} />
-        <Route path="/vendas" element={<VendasPage />} />
-        <Route path="/compras" element={<ComprasPage />} />
-        <Route path="/perfil" element={<PerfilPage />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/Perfil" element={token ? <Perfil /> : <Navigate to="/login" />} />
+        <Route path="/Vendas" element={token ? <Vendas /> : <Navigate to="/login" />} />
+        <Route path="/Compras" element={token ? <Compras /> : <Navigate to="/login" />} />
+        <Route path="/Menu" element={token ? <Menu /> : <Navigate to="/login" />} />
+
+        <Route path="/" element={<Navigate to={token ? "/login" : "/login"} />} />
       </Routes>
     </Router>
   );

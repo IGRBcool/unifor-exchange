@@ -24,7 +24,7 @@ function Perfil() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const handleDeleteAccount = async () => {
@@ -38,7 +38,7 @@ function Perfil() {
 
       localStorage.removeItem('token');
       alert('Conta excluída com sucesso!');
-      navigate('/');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Erro ao excluir conta', error);
       alert('Não foi possível excluir a conta no momento.');

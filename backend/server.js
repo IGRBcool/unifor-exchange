@@ -188,6 +188,7 @@ app.post('/login', async (req, res) => {
     );
 
     res.status(200).json({ message: 'Login realizado com sucesso!', token });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao realizar login' });
@@ -266,6 +267,48 @@ app.delete ('/perfil', autenticarToken, async (req, res) => {
     res.status(500).json({ error: 'Erro ao excluir usuário' });
   }
 });
+
+
+app.get('/compras', async (req, res) => {
+  const { busca, categoria, estado } = req.query;
+
+  try {
+    let sql = `
+      SELECT Produto.id, titulo, descricao, preco, categoria, estado, Usuario.nome AS vendedor
+      FROM Produto
+      JOIN Usuario ON Produto.usuario_id = Usuario.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (busca) {
+      sql += " AND (titulo LIKE ? OR descricao LIKE ?)";
+      params.push(`%${busca}%`, `%${busca}%`);
+    }
+
+    if (categoria) {
+      sql += " AND categoria = ?";
+      params.push(categoria);
+    }
+
+    if (estado) {
+      sql += " AND estado = ?";
+      params.push(estado);
+    }
+
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Erro ao buscar produtos' });
+      }
+      res.json(rows);
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Erro interno no servidor' });
+  }
+});
+
 
 
 
