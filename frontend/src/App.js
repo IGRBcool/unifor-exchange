@@ -19,13 +19,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={token ? <Navigate to="/menu" replace /> : <Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/perfil" element={token ? <Perfil /> : <Navigate to="/login" replace />} />
         <Route path="/vendas" element={token ? <Vendas /> : <Navigate to="/login" replace />} />
         <Route path="/compras" element={token ? <Compras /> : <Navigate to="/login" replace />} />
         <Route path="/menu" element={token ? <Menu /> : <Navigate to="/login" replace />} />
         <Route path="/cadastro" element={token ? <Navigate to="/menu" replace /> : <Cadastro />} />
-        <Route path="/" element={<Navigate to={token ? "/menu" : "/login"} replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

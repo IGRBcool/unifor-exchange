@@ -309,6 +309,8 @@ app.get('/compras', async (req, res) => {
       params.push(estadoNormalizado);
     }
 
+    sql += " ORDER BY Produto.criado_em DESC";
+
     db.all(sql, params, (err, rows) => {
       if (err) {
         console.error(err);

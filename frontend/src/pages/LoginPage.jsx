@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-function LoginPage() { 
+function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
@@ -48,11 +48,11 @@ function LoginPage() {
           />
           <button
             type="submit"
-            onClick={handleLogin}
-            className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
+            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 font-bold"
           >
-            Login
+            Entrar
           </button>
+          
 
           <p className="mt-4 text-sm text-gray-600">
             Não tem conta?{" "}

@@ -54,6 +54,7 @@ function Compras() {
           <option value="Eletrônicos">Eletrônicos</option>
           <option value="Vestuario">Vestuario</option>
           <option value="Livros">Livros</option>
+          <option value="Materiais">Materiais</option>
         </select>
 
         <select
@@ -71,16 +72,20 @@ function Compras() {
         <h2>Produtos disponíveis</h2>
       </div>
 
-      <ul className="space-y-2">
-        {produtos.map((p) => (
-          <li key={p.id} className="border p-4 rounded">
-            <strong>{p.titulo}</strong> - R$ {p.preco}
-            <p>{p.descricao}</p>
-            <small>Categoria: {p.categoria} | Estado: {p.estado}</small><br />
-            <small>Vendedor: {p.vendedor}</small>
-          </li>
-        ))}
-      </ul>
+      {produtos.length === 0 ? (
+        <p className="text-gray-500">Nenhum produto encontrado.</p>
+      ) : (
+        <ul className="space-y-2">
+          {produtos.map((p) => (
+            <li key={p.id} className="border p-4 rounded">
+              <strong>{p.titulo}</strong> - R$ {p.preco}
+              <p>{p.descricao}</p>
+              <small>Categoria: {p.categoria} | Estado: {p.estado}</small><br />
+              <small>Vendedor: {p.vendedor}</small>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
