@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 function Compras() {
@@ -6,15 +6,23 @@ function Compras() {
   const [busca, setBusca] = useState('');
   const [categoria, setCategoria] = useState('');
   const [estado, setEstado] = useState('');
+  const requestIdRef = useRef(0);
 
   const carregarProdutos = async () => {
+    const requestId = ++requestIdRef.current;
+
     try {
       const response = await axios.get('/compras', {
-        params: { busca, categoria, estado }
+        params: { busca: busca.trim(), categoria, estado }
       });
-      setProdutos(response.data);
+
+      if (requestId === requestIdRef.current) {
+        setProdutos(response.data);
+      }
     } catch (error) {
-      console.error('Erro ao carregar produtos', error);
+      if (requestId === requestIdRef.current) {
+        console.error('Erro ao carregar produtos', error);
+      }
     }
   };
 
@@ -44,7 +52,7 @@ function Compras() {
         >
           <option value="">Todas categorias</option>
           <option value="Eletrônicos">Eletrônicos</option>
-          <option value="Roupas">Roupas</option>
+          <option value="Vestuario">Vestuario</option>
           <option value="Livros">Livros</option>
         </select>
 

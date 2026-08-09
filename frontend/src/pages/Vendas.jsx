@@ -33,9 +33,20 @@ function Vendas() {
   }
 
 
-    useEffect(() => {
-      carregarProdutos();
-    }, []);
+  useEffect(() => {
+  const carregarProdutos = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/vendas', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProdutos(response.data);
+    } catch (error) {
+      console.error('Erro ao carregar produtos do usuário', error);
+    }
+  };
+  carregarProdutos();
+}, []);
 
     const cadastrarProduto = async (e) => {
       e.preventDefault();

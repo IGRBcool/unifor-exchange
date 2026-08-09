@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function LoginPage() { 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const navigate = useNavigate(); // corrigido
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('/login', { email, senha });
-      localStorage.setItem('token', response.data.token);
-      alert('Login realizado com sucesso!');
-      navigate('/menu'); // redireciona para o menu
+      const token = response.data?.token;
+
+      if (!token) {
+        throw new Error('Token não recebido');
+      }
+
+      localStorage.setItem('token', token);
+      window.location.replace('/menu');
     } catch (error) {
       alert('Credenciais inválidas!');
     }

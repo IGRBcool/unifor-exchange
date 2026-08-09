@@ -225,20 +225,21 @@ app.post('/vendas', autenticarToken, async (req, res) => {
 });
 
 
-app.get('/vendas', async (req, res) => {
+app.get('/vendas', autenticarToken, async (req, res) => {
   try {
-    db.all('SELECT Produto.id, titulo, descricao, preco, categoria, estado, Usuario.nome AS vendedor FROM Produto JOIN Usuario ON Produto.usuario_id = Usuario.id', [], (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Erro ao listar produtos' });
+    db.all(
+      'SELECT id, titulo, descricao, preco, categoria, estado, criado_em FROM Produto WHERE usuario_id = ?',
+      [req.user.id],
+      (err, rows) => {
+        res.json(rows);
       }
-      res.json(rows);
-    });
+    );
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erro ao buscar produtos' });
   }
 });
+
 
 app.delete('/vendas/:id', autenticarToken, async (req, res) => {
   const { id } = req.params;
@@ -269,6 +270,15 @@ app.delete ('/perfil', autenticarToken, async (req, res) => {
 });
 
 
+function normalizarTexto(valor) {
+  if (!valor) return '';
+  return String(valor)
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
 app.get('/compras', async (req, res) => {
   const { busca, categoria, estado } = req.query;
 
@@ -280,20 +290,23 @@ app.get('/compras', async (req, res) => {
       WHERE 1=1
     `;
     const params = [];
+    const buscaNormalizada = normalizarTexto(busca);
+    const categoriaNormalizada = normalizarTexto(categoria);
+    const estadoNormalizado = normalizarTexto(estado);
 
-    if (busca) {
-      sql += " AND (titulo LIKE ? OR descricao LIKE ?)";
-      params.push(`%${busca}%`, `%${busca}%`);
+    if (buscaNormalizada) {
+      sql += " AND (LOWER(titulo) LIKE ? OR LOWER(descricao) LIKE ?)";
+      params.push(`%${buscaNormalizada}%`, `%${buscaNormalizada}%`);
     }
 
-    if (categoria) {
-      sql += " AND categoria = ?";
-      params.push(categoria);
+    if (categoriaNormalizada) {
+      sql += " AND LOWER(categoria) = ?";
+      params.push(categoriaNormalizada);
     }
 
-    if (estado) {
-      sql += " AND estado = ?";
-      params.push(estado);
+    if (estadoNormalizado) {
+      sql += " AND LOWER(estado) = ?";
+      params.push(estadoNormalizado);
     }
 
     db.all(sql, params, (err, rows) => {

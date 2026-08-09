@@ -177,3 +177,45 @@ test('POST /vendas cadastra produto no banco', async () => {
     await closeDatabase();
   }
 });
+
+test('GET /compras filtra categoria e estado mesmo quando os valores chegam com letras diferentes', async () => {
+  if (fs.existsSync(testDbPath)) {
+    fs.unlinkSync(testDbPath);
+  }
+
+  await initializeDatabase();
+  await createUsuarioTable();
+  await createProdutoTable();
+
+  const hashedPassword = await bcrypt.hash('123456', 10);
+  await createDatabaseRow(testDbPath, 'ana@teste.com', hashedPassword);
+
+  await new Promise((resolve, reject) => {
+    const db = new sqlite3.Database(testDbPath);
+    db.run(
+      'INSERT INTO Produto (usuario_id, titulo, descricao, preco, categoria, estado) VALUES (?, ?, ?, ?, ?, ?)',
+      [1, 'Caderno', 'Caderno universitário', 25.5, 'livros', 'novo'],
+      (err) => {
+        db.close();
+        if (err) return reject(err);
+        resolve();
+      }
+    );
+  });
+
+  const server = app.listen(0);
+  await new Promise((resolve) => server.once('listening', resolve));
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/compras?categoria=Livros&estado=Novo`);
+
+    assert.equal(response.status, 200);
+    const produtos = await response.json();
+
+    assert.equal(produtos.length, 1);
+    assert.equal(produtos[0].titulo, 'Caderno');
+  } finally {
+    await new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())));
+    await closeDatabase();
+  }
+});
