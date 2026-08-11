@@ -1,70 +1,136 @@
-# Getting Started with Create React App
+PROJETO UNIFOR-EXCHANGE (desafio Vortex)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplicação web que permite os alunos da Universidade de Fortaleza e outros a cadastrarem seus produtos e comprarem de outros!
 
-## Available Scripts
+Comando backend: "node server.js" em Git Bash
+Comando frontend: "npm start" em Git Bash
 
-In the project directory, you can run:
+Frameworks e bibliotecas utilizadas:
+Backend: Express,CORS,bcrypt,jsonwebtoken,sqlite3 e path.
+Frontend: React,Tailwind e AXIOS.
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+Diário de bordo da IA (Copilot e Github Copilot foram utilizados):
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+🔹 Primeiros passos
+Você começou com um erro no Perfil.jsx: AxiosError: Request failed with status code 500.
 
-### `npm run build`
+Identificamos que o problema estava no backend: uso incorreto de jwt.verify e sintaxe de Postgres ($1, rows[0]) em vez de SQLite.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Corrigimos para usar JWT_SECRET e getQuery com ?.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+🔹 Ajustes no backend
+Criamos a rota /perfil corretamente fora do /login.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Adicionamos console.log para depuração e vimos que o erro era “no such column: nome”.
 
-### `npm run eject`
+Descobrimos que a tabela Usuario não tinha as colunas novas.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Recriamos/alteramos a tabela para incluir nome e data_nascimento.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Resultado: a rota /perfil passou a retornar os dados do usuário corretamente.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+🔹 Evolução para marketplace
+Criamos a tabela Produto com colunas: titulo, descricao, preco, categoria, estado.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Implementamos rotas:
 
-## Learn More
+POST /vendas → cadastrar produto (somente usuário autenticado).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+GET /vendas → listar produtos.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Depois, ajustamos para que /vendas mostre apenas os produtos do usuário logado.
 
-### Code Splitting
+Criamos /compras para listar todos os produtos de todos os usuários, com filtros e pesquisa.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+🔹 Frontend
+Construímos páginas:
 
-### Analyzing the Bundle Size
+Login → autenticação e armazenamento do token no localStorage.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Perfil → exibe dados do usuário autenticado.
 
-### Making a Progressive Web App
+Vendas → formulário para cadastrar produto e lista dos produtos do usuário.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Compras → lista de todos os produtos com barra de pesquisa e filtros.
 
-### Advanced Configuration
+Ajustamos o App.js com React Router para proteger rotas:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Bloqueio da tela de login quando o usuário já está logado.
 
-### Deployment
+Redirecionamento para /login se não houver token.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Logout remove o token e volta para login.
 
-### `npm run build` fails to minify
+🔹 Últimos ajustes
+Corrigimos os imports das páginas (LoginPage, Perfil, Vendas, Compras, Menu).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Garantimos que /login fica inacessível para usuários logados.
+
+Agora o ciclo está completo: cadastro → login → perfil → vendas → compras → logout.
+
+
+
+
+
+Prompts do GITHUB COPILOT:
+
+"Os filtros em compras.jsx não estão funcionando corretamente, pode corrigir isso?"
+
+
+
+Vou inspecionar a lógica do componente de compras e reproduzir o comportamento para localizar a causa antes de ajustar os filtros.
+
+A investigação indicou que a página já envia os parâmetros ao backend; agora estou verificando o endpoint para confirmar se ele está aplicando esses filtros corretamente.
+
+Read server.js
+
+O fluxo de envio está correto no front, então estou validando a integração com o backend para identificar por que o filtro não está surtindo efeito.
+
+Estou adicionando um teste de regressão para reproduzir o problema de respostas antigas sobrescreverem os filtros mais recentes.
+
+Created Compras.test.jsx
+
+A causa mais provável é a atualização assíncrona sobrescrever o estado com respostas antigas. Estou aplicando uma correção para garantir que somente a última requisição válida atualize a lista.
+
+cd "c:/Users/igorc/OneDrive/Documentos/CSS/unifor-exchange/frontend" && npm test -- --watch=false --runInBand --runTestsByPath src/pages/Compras.test.jsx
+A correção será pequena e localizada: eu vou garantir que somente a resposta da última busca atualize a lista, evitando que resultados antigos sobrescrevam os filtros mais recentes.
+
+Edited
+Compras.jsx+12-4
+A alteração já está no componente; estou rodando o teste novamente para validar que a lista agora acompanha a última busca.
+
+✅ Correção aplicada
+Os filtros em Compras.jsx agora funcionam de forma consistente, inclusive quando as respostas da API chegam fora de ordem.
+
+O que foi ajustado
+Evitei que respostas antigas sobrescrevessem os resultados da última busca.
+O componente agora usa a última requisição válida para atualizar a lista de produtos.
+Também normalizei a busca para remover espaços extras antes de enviar ao backend.
+
+
+
+
+"Um erro está ocorrendo: ao fazer o login, a página se mantém na rota login, e o menu só é ativado ao reiniciar o api. Pode consertar isso?"
+
+
+Vou verificar o fluxo de login e o estado do token após a resposta da API, porque o redirecionamento parece estar acontecendo em um ponto que não está refletindo no componente atual.
+
+O problema está no fato de que o roteador lê o token uma vez no início e não atualiza após o login. Vou mudar isso para que a aplicação reaja ao armazenamento do token imediatamente após o login.
+
+
+App.js+11-1
+A correção foi aplicada no ponto onde o estado do usuário é lido; agora a aplicação vai reagir imediatamente ao token assim que o login for concluído.
+
+✅ Correção aplicada
+O problema acontecia porque o roteamento estava lendo o token apenas uma vez no carregamento inicial. Depois do login, o app não “reconhecia” a nova sessão até reiniciar.
+
+O que foi ajustado
+O componente principal agora monitora o token em estado React.
+Assim que o token é salvo no localStorage, o app atualiza a rota automaticamente.
+O login passa a levar direto para o menu sem depender de reinicialização da API.
+
+
+Em alguns momentos, o Copilot ou o Github Copilot criavam códigos e soluções não compatíveis com os códigos anteriores, como erros de declaração de variáveis e funções. O que me fez inspecionar o terminal algumas vezes para identificar os erros erros mais precisamente, e somente assim dar a instrução correta e precisa.
