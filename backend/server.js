@@ -228,9 +228,17 @@ app.post('/vendas', autenticarToken, async (req, res) => {
 app.get('/vendas', autenticarToken, async (req, res) => {
   try {
     db.all(
-      'SELECT id, titulo, descricao, preco, categoria, estado, criado_em FROM Produto WHERE usuario_id = ?',
+      `SELECT Produto.id, Produto.titulo, Produto.descricao, Produto.preco, Produto.categoria, Produto.estado, Produto.criado_em, Usuario.nome AS vendedor
+       FROM Produto
+       JOIN Usuario ON Produto.usuario_id = Usuario.id
+       WHERE Produto.usuario_id = ?
+       ORDER BY Produto.criado_em DESC`,
       [req.user.id],
       (err, rows) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Erro ao buscar produtos' });
+        }
         res.json(rows);
       }
     );

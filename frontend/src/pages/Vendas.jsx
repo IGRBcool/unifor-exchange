@@ -124,24 +124,30 @@ function Vendas() {
           </button>
         </form>
 
-        <h3 className="text-xl font-semibold mb-4">Seus produtos</h3>
-        <ul className="space-y-2">
-          {produtos.map((p) => (
-            <li key={p.id} className="border p-4 rounded">
-              <div className="right-0 top-0 flex justify-end">
-                <button onClick={() => excluirProduto(p.id)} className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 mb-2 flex gap-2">
-                  Excluir das suas vendas
-                </button>
-              </div>
+        <div className="flex items-center justify-between mb-4 font-bold">
+          <h2>Produtos disponíveis</h2>
+        </div>
 
-              <strong>{p.titulo}</strong> - R$ {p.preco}
-              <p>{p.descricao}</p>
-              <p>Categoria: {p.categoria}</p>
-              <p>Estado: {p.estado}</p>
-              <small>Vendedor: {p.vendedor}</small>
-            </li>
-          ))}
-        </ul>
+        {produtos.length === 0 ? (
+          <p className="text-gray-500">Nenhum produto encontrado.</p>
+        ) : (
+          <ul className="space-y-2 ">
+            {produtos.map((p) => (
+              <li key={p.id} className="border p-4 rounded">
+                <div className="flex justify-end mb-2">
+                  <button onClick={() => excluirProduto(p.id)} className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600">
+                    Excluir das suas vendas
+                  </button>
+                </div>
+
+                <strong>{p.titulo}</strong> - R$ {p.preco}
+                <p>{p.descricao}</p>
+                <small>Categoria: {p.categoria} | Estado: {p.estado}</small><br />
+                <small>Vendedor: {p.vendedor || 'Você'}</small>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     );
   }
